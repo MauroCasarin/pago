@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Botón de Pago con Sonido Reiniciable</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column; /* Organiza los elementos en columna */
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0; /* Color de fondo inicial */
+            transition: background-color 1s ease; /* Transición suave para el cambio de color */
+            margin: 0;
+            overflow: hidden; /* Evita scroll si el contenido es solo los botones */
+        }
+
+        .paid {
+            background-color: #a8e6cf; /* Color de fondo después del "pago" (verde claro) */
+        }
+
+        .button-container {
+            display: flex; /* Usa flexbox para alinear los botones */
+            gap: 20px; /* Espacio entre los botones */
+            margin-top: 20px; /* Espacio encima de los botones */
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 20px;
+            cursor: pointer;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
+        }
+
+        #payButton {
+            background-color: #4CAF50; /* Color verde para el botón Pagar */
+        }
+
+        #payButton:hover {
+            background-color: #45a049;
+        }
+
+        #payButton:active {
+            background-color: #39843c;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transform: translateY(2px);
+        }
+
+        #restartButton {
+            background-color: #f44336; /* Color rojo para el botón Reiniciar */
+        }
+
+        #restartButton:hover {
+            background-color: #e53935;
+        }
+
+        #restartButton:active {
+            background-color: #d32f2f;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transform: translateY(2px);
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="button-container">
+        <button id="payButton">Pagar</button>
+        <button id="restartButton" style="display: none;">Reiniciar</button> </div>
+
+
+    <audio id="paymentSound" src="http://www.marcelomagni.com.ar/sound/pago.mp3" preload="auto"></audio>
+
+    <script>
+        const payButton = document.getElementById('payButton');
+        const restartButton = document.getElementById('restartButton'); // Referencia al nuevo botón
+        const paymentSound = document.getElementById('paymentSound');
+        const body = document.body;
+
+        // Función para reiniciar el estado
+        function resetSimulation() {
+            body.classList.remove('paid'); // Elimina la clase 'paid'
+            payButton.textContent = 'Pagar'; // Restablece el texto del botón Pagar
+            payButton.disabled = false; // Habilita el botón Pagar
+            restartButton.style.display = 'none'; // Oculta el botón Reiniciar
+        }
+
+        payButton.addEventListener('click', () => {
+            // Solo procede si el botón no está deshabilitado
+            if (!payButton.disabled) {
+                // Reproducir el sonido
+                paymentSound.play();
+
+                // Deshabilitar el botón para evitar clics múltiples durante el proceso
+                payButton.disabled = true;
+                payButton.textContent = 'Procesando...';
+
+                // Simular un proceso de pago con un retardo
+                setTimeout(() => {
+                    // Cambiar el color de fondo del body
+                    body.classList.add('paid');
+
+                    // Cambiar el texto del botón después del "pago"
+                    payButton.textContent = '¡Pagado!';
+
+                    // Mostrar el botón de Reiniciar
+                    restartButton.style.display = 'block'; // O 'inline-block' dependiendo del diseño deseado
+
+                }, 2000); // 2000 milisegundos = 2 segundos de espera
+            }
+        });
+
+        // Añadir evento al botón Reiniciar
+        restartButton.addEventListener('click', () => {
+            resetSimulation(); // Llama a la función de reinicio
+        });
+
+
+        // Para asegurar que el sonido se pueda reproducir en iOS y algunos navegadores móviles
+        // que requieren una interacción inicial del usuario para permitir la reproducción de audio.
+        // Agregamos un listener para intentar cargar el sonido al tocar en cualquier parte de la pantalla.
+        document.addEventListener('touchstart', () => {
+            paymentSound.load();
+        }, { once: true }); // Usamos once: true para que solo se ejecute la primera vez
+
+    </script>
+
+</body>
+</html>
